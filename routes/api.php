@@ -9,6 +9,7 @@ use App\Http\Controllers\FileController;
 |--------------------------------------------------------------------------
 */
 
+// Test routes
 Route::get('/test', function () {
     return response()->json([
         'message' => 'cloudFilesBackend API is working',
@@ -45,11 +46,21 @@ Route::post('/test-upload-simple', function (Illuminate\Http\Request $request) {
     }
 });
 
+// File management routes
 Route::prefix('files')->group(function () {
+    // Basic CRUD
     Route::get('/', [FileController::class, 'index']);
     Route::post('/upload', [FileController::class, 'upload']);
     Route::get('/stats', [FileController::class, 'stats']);
     Route::get('/{id}', [FileController::class, 'show']);
     Route::put('/{id}', [FileController::class, 'update']);
     Route::delete('/{id}', [FileController::class, 'destroy']);
+    
+    // Sharing routes
+    Route::post('/{id}/shares', [FileController::class, 'createShare']);
+    Route::get('/{id}/shares', [FileController::class, 'listShares']);
+    Route::delete('/{id}/shares/{shareId}', [FileController::class, 'deleteShare']);
 });
+
+// Public shared file access (no auth required)
+Route::get('/shared/{token}', [FileController::class, 'accessShared']);
